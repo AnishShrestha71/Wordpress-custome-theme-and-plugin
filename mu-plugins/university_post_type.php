@@ -62,5 +62,20 @@ function university_post_type()
         ),
         'menu_icon' => 'dashicons-location-alt'
     ));
+
+    register_post_type('note', array(
+        'show_in_rest' => true,
+        'supports' => array('title', 'editor'),
+        'public' => false,
+        'show_ui' => true,
+        'labels' => array(
+            'name' => 'note',
+            'add_new_item' => 'Add New note',
+            'edit_item' => 'Edit note',
+            'all_items' => 'All notes',
+            'singular_name' => 'note'
+        ),
+        'menu_icon' => 'dashicons-location-alt'
+    ));
 }
 add_action('init', 'university_post_type');
