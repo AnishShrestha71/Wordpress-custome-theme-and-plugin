@@ -28,6 +28,7 @@ while(have_posts()){
     <input type="text" class="new-note-title" placeholder="title">
     <textarea name="" id="" cols="30" rows="10" class="new-note-body" placeholder="your note here"></textarea>
     <span class="submit-note">Create Note</span>
+    <span class="note-limit-message">limit exceeded. Delete to old ones add new</span>
   </div>
 <ul class="min-list link-list" id="my-notes">
 <?php 
@@ -44,9 +45,10 @@ while(have_posts()){
       $userNotes->the_post();
       ?>
         <li data-id="<?php  the_ID() ?>">
-          <input readonly type="text" class="note-title-field" value="<?php echo esc_attr(get_the_title())?>">
+          <input readonly type="text" class="note-title-field" value="<?php echo str_replace('Private: ','',esc_attr(get_the_title()));?>">
           <span class="edit-note"><i class="fa fa-pencil" aria-hidden="true">Edit</i></span>
           <span class="delete-note"><i class="fa fa-trash-o" aria-hidden="true">Delete</i></span>
+          
           
           <textarea readonly name="" id="" class="note-body-field" cols="30" rows="10"><?php echo esc_attr(wp_strip_all_tags(get_the_content())) ?> </textarea>
           <span class="update-note btn btn--blue btn--small"><i class="fa fa-arrow-right" aria-hidden="true">Save</i></span>

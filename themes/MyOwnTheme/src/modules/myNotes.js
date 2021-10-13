@@ -25,6 +25,10 @@ class myNotes {
         console.log("sucess");
         console.log(Response);
         noteID.slideUp();
+        if(Response.countNote < 5){
+          jQuery(".note-limit-message").removeClass("active");
+          // alert('hello');
+        }
       },
       error: (Response) => {
         console.log("error");
@@ -125,10 +129,17 @@ class myNotes {
           .prependTo("#my-notes")
           .hide()
           .slideDown();
+          
+          
+
       },
       error: (Response) => {
         console.log("error");
         console.log(Response);
+        if(Response.responseText == 'limit exceeded'){
+          jQuery(".note-limit-message").addClass("active");
+          // alert('hello');
+        }
       },
     });
   }

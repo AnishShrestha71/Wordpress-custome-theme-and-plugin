@@ -20,10 +20,10 @@ function pageBanner($args = NULL)
 ?>
 
     <div class="page-banner">
-    <div class="page-banner__bg-image" style="background-image: url(<?php echo $args['photo']
-                                                                            ?>);"></div>
+        <div class="page-banner__bg-image" style="background-image: url(<?php echo $args['photo']
+                                                                        ?>);"></div>
         <div class="page-banner__content container container--narrow">
-            
+
             <h1 class="page-banner__title"><?php echo $args['title'] ?></h1>
             <div class="page-banner__intro">
                 <p><?php echo $args['subtitle']; ?></p>
@@ -48,16 +48,17 @@ function university_file()
     ));
 }
 add_action('wp_enqueue_scripts', 'university_file');
-function add_type_attribute($tag, $handle, $src) {
+function add_type_attribute($tag, $handle, $src)
+{
     // if not your script, do nothing and return original $tag
-    if ( 'main-js' !== $handle ) {
+    if ('main-js' !== $handle) {
         return $tag;
     }
     // change the script tag by adding type="module" and return it.
-    $tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
+    $tag = '<script type="module" src="' . esc_url($src) . '"></script>';
     return $tag;
 }
-add_filter('script_loader_tag', 'add_type_attribute' , 10, 3);
+add_filter('script_loader_tag', 'add_type_attribute', 10, 3);
 
 function features()
 {
@@ -93,16 +94,24 @@ function university_adjust_queries($query)
 }
 add_action('pre_get_posts', 'university_adjust_queries');
 
-function universityMapKey($api){
+function universityMapKey($api)
+{
     $api['key'] = 'AIzaSyCPQwBiWsMW7TeK58DXvgneN5RE48-8gbg';
     return $api;
 }
 add_filter('acf/fields/google_map/api', 'universityMapKey');
 
-function university_custom_rest(){
-    register_rest_field('post','authorName',array(
-        'get_callback' => function(){
+function university_custom_rest()
+{
+    register_rest_field('post', 'authorName', array(
+        'get_callback' => function () {
             return get_the_author();
+        }
+    ));
+
+    register_rest_field('note', 'countNote', array(
+        'get_callback' => function () {
+            return count_user_posts(get_current_user_id(),'note');
         }
     ));
 }
@@ -115,29 +124,31 @@ require get_theme_file_path('/include/custom_search_api.php');
 
 add_action('admin_init', 'redirectUser');
 
-function redirectUser(){
- $auth_user = wp_get_current_user();
-    if(count($auth_user->roles) == 1 AND $auth_user->roles[0] == 'subscriber'){
-        wp_redirect(site_url('/')); 
+function redirectUser()
+{
+    $auth_user = wp_get_current_user();
+    if (count($auth_user->roles) == 1 and $auth_user->roles[0] == 'subscriber') {
+        wp_redirect(site_url('/'));
         exit;
- }
+    }
 }
 
 
 add_action('wp_loaded', 'hideBar');
 
-function hideBar(){
- $auth_user = wp_get_current_user();
-    if(count($auth_user->roles) == 1 AND $auth_user->roles[0] == 'subscriber'){
-        show_admin_bar(false); 
-      
- }
+function hideBar()
+{
+    $auth_user = wp_get_current_user();
+    if (count($auth_user->roles) == 1 and $auth_user->roles[0] == 'subscriber') {
+        show_admin_bar(false);
+    }
 }
 
 //Customise login screen
 add_filter('login_headerurl', 'ourHeaderUrl');
 
-function ourHeaderUrl(){
+function ourHeaderUrl()
+{
     return esc_url(site_url('/'));
 }
 
@@ -154,4 +165,22 @@ add_filter('login_headertitle', 'loginTitle');
 function loginTitle()
 {
     return get_bloginfo('name');
+}
+
+//force notes to be private
+add_filter('wp_insert_post_data', 'makeNotePrivate',10,2);
+
+function makeNotePrivate($data, $postarr)
+{
+    if ($data['post_type'] == 'note') {
+        if(count_user_posts(get_current_user_id(), 'note') > 4 AND !$postarr['ID']){
+            die("limit exceeded");
+        }
+        $data['post_content'] = sanitize_textarea_field($data['post_content']);
+        $data['post_title'] = sanitize_text_field($data['post_title']);
+    }
+    if ($data['post_type'] == 'note' and $data['post_status'] != 'trash') {
+        $data['post_status'] = 'private';
+    }
+    return $data;
 }
