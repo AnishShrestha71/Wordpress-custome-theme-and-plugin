@@ -1,4 +1,6 @@
 <?php
+require get_theme_file_path('/include/custom_search_api.php');
+require get_theme_file_path('/include/custom_like_api.php');
 function pageBanner($args = NULL)
 {
 
@@ -116,8 +118,6 @@ function university_custom_rest()
     ));
 }
 add_action('rest_api_init', 'university_custom_rest');
-
-require get_theme_file_path('/include/custom_search_api.php');
 
 
 //Redireect user

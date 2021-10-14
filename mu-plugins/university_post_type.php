@@ -77,7 +77,21 @@ function university_post_type()
             'all_items' => 'All notes',
             'singular_name' => 'note'
         ),
-        'menu_icon' => 'dashicons-location-alt'
+        'menu_icon' => 'dashicons-welcome-write-blog'
+    ));
+
+    register_post_type('like', array(
+        'supports' => array('title'),
+        'public' => false,
+        'show_ui' => true,
+        'labels' => array(
+            'name' => 'like',
+            'add_new_item' => 'Add New like',
+            'edit_item' => 'Edit like',
+            'all_items' => 'All likes',
+            'singular_name' => 'like'
+        ),
+        'menu_icon' => 'dashicons-heart'
     ));
 }
 add_action('init', 'university_post_type');

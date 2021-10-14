@@ -3,9 +3,9 @@
 get_header();
 
 while (have_posts()) {
-    the_post(); 
-    pageBanner();?>
-   
+    the_post();
+    pageBanner(); ?>
+
 
     <div class="container container--narrow page-section">
         <div class="metabox metabox--position-up metabox--with-home-link">
@@ -17,12 +17,60 @@ while (have_posts()) {
                 <div class="one-third">
                     <?php the_post_thumbnail();
                     ?></div>
-                <div class="two-third"><?php the_content(); ?></div>
+                <div class="two-third">
+                    <?php
+                    $likeCount = new WP_Query(array(
+                        'post_type' => 'like',
+                        'meta_query' => array(
+
+                            array(
+                                'key' => 'like_professor_id',
+                                'compare' => '=',
+                                'value' => get_the_ID()
+                            )
+                        )
+                    ));
+
+                    $status = 'no';
+
+                    if (is_user_logged_in()) {
+                        $existQuery = new WP_Query(array(
+                            'author' => get_current_user_id(),
+                            'post_type' => 'like',
+                            'meta_query' => array(
+
+                                array(
+                                    'key' => 'like_professor_id',
+                                    'compare' => '=',
+                                    'value' => get_the_ID()
+                                )
+                            )
+                        ));
+
+                        if ($existQuery->found_posts) {
+                            $status = 'yes';
+                        }
+                    }
+
+
+
+                    ?>
+                    <span class="like-box" data-professor="<?php the_ID(); ?>" data-exists="<?php echo $status; ?>"  data-like="<?php 
+                        if($existQuery->posts){
+                            echo $existQuery->posts[0]->ID;
+                        }
+                    ?>">
+                        <i class="fa fa-heart-o " aria-hidden="true"></i>
+                        <i class="fa fa-heart" aria-hidden="true"></i>
+                        <span class="like-count"><?php echo $likeCount->found_posts; ?></span>
+                    </span>
+                    <?php the_content(); ?>
+                </div>
             </div>
         </div>
 
         <?php
-       
+
         $relatedPrograms = get_field('related_programs');
         if ($relatedPrograms) {
             echo '<hr class="section-break"?>';
